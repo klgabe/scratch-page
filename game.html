@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Flight Delays: Interactive Experience</title>
+  <link rel="stylesheet" href="css/styles.css">
+
+  <style>
+    /* ===== PROVIDED SITE THEME ===== */
+    body {
+      background-color: rgb(211, 226, 219);
+      font-family: Arial, Helvetica, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1 {
+      text-align: center;
+      font-family:'Times New Roman', Times, serif;
+      font-size: 60px;
+      color: #4f360b;
+      font-weight: bold;
+      margin-top: 30px;
+    }
+
+    h2 {
+      font-family:'Times New Roman', Times, serif;
+      font-size: 36px;
+      color: #4f360b;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .container {
+      font-family: Arial, Helvetica, sans-serif;
+      margin: 30px;
+      border: #393021 solid 12px;
+      padding: 30px;
+      background-color: rgb(241, 240, 235);
+    }
+
+    .text {
+      font-size: 22px;
+      color: rgb(211, 226, 219);
+      border: 3px solid #393021;
+      padding: 30px;
+      background-color:#393021;
+      text-align: center;
+      font-weight: bolder;
+      margin-bottom: 30px;
+    }
+
+    /* ===== GAME STYLING ===== */
+    .game-wrapper {
+      border: 4px solid #393021;
+      padding: 20px;
+      background: #ffffff;
+    }
+
+    .score {
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: #393021;
+      margin-bottom: 12px;
+    }
+
+    .game {
+      position: relative;
+      height: 280px;
+      background: linear-gradient(to top, #d1d5db 40%, #f9fafb 40%);
+      border: 3px solid #393021;
+      overflow: hidden;
+    }
+
+    .ground {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 4px;
+      background: #393021;
+    }
+
+    /* ===== SVG PLAYER ===== */
+    .player {
+      position: absolute;
+      bottom: 4px;
+      left: 80px;
+      width: 70px;
+      animation: run 0.4s infinite alternate;
+    }
+
+    @keyframes run {
+      from { transform: translateY(0); }
+      to { transform: translateY(-4px); }
+    }
+
+    /* ===== SUITCASES (AIRLINE BRAND COLORS) ===== */
+    :root {
+      --airline-primary: #1f4d8c;   /* change for branding */
+      --airline-accent: #caa34d;
+    }
+
+    .suitcase {
+      position: absolute;
+      bottom: 4px;
+      border-radius: 4px;
+      background: var(--airline-primary);
+    }
+
+    .carryon { width: 28px; height: 20px; }
+    .checked { width: 42px; height: 30px; background: var(--airline-accent); }
+
+    .suitcase::before {
+      content: "";
+      position: absolute;
+      top: -6px;
+      left: 20%;
+      width: 60%;
+      height: 6px;
+      border: 2px solid #393021;
+      border-bottom: none;
+      border-radius: 4px 4px 0 0;
+    }
+
+    /* ===== GAME OVER ===== */
+    .game-over {
+      position: absolute;
+      inset: 0;
+      background: rgba(57,48,33,0.9);
+      color: rgb(211,226,219);
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Times New Roman', Times, serif;
+      text-align: center;
+    }
+
+    .game-over h3 {
+      font-size: 42px;
+      margin-bottom: 20px;
+    }
+
+    .game-over button {
+      padding: 12px 24px;
+      font-size: 20px;
+      border: none;
+      background: rgb(211,226,219);
+      color: #393021;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .instructions {
+      text-align: center;
+      margin-top: 16px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #393021;
+    }
+
+    .navigation {
+    font-size: 20px;
+    text-align: center;
+    border: 3px solid #393021;
+    padding: 20px;
+    margin: 30px;
+    background-color: #393021;
+    color: rgb(122, 132, 127);
+    font-family: 'Times New Roman', Times, serif;
+    font-weight: bolder;
+    }
+
+    a {
+    color: rgb(211, 226, 219);
+    text-decoration: none;
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="navigation" id="home">
+    <a href="index.html">Home</a> |
+    <a href="game.html">Flight Delay Game</a> |
+    <a href="more.html">Learn More</a>
+    | <a href="https://klgabe.github.io/Kathryn-Gabrielsen-Personal-Website/index.html">My Resume</a>
+</div>
+
+<h1>Flight Delays</h1>
+
+<div class="container">
+  <h2>Interactive Experience</h2>
+
+  <div class="text">
+    Sometimes delays feel like sprinting through the terminal — dodging luggage, watching the clock,
+    and hoping your gate is still open. Try it yourself below.
+  </div>
+
+  <div class="game-wrapper">
+    <div class="score">Score: <span id="score">0</span></div>
+
+    <div class="game" id="game">
+      <!-- SVG Player -->
+      <svg class="player" id="player" viewBox="0 0 100 120">
+        <circle cx="50" cy="15" r="10" fill="#393021" />
+        <line x1="50" y1="25" x2="50" y2="55" stroke="#393021" stroke-width="4" />
+        <line x1="50" y1="35" x2="30" y2="50" stroke="#393021" stroke-width="4" />
+        <line x1="50" y1="35" x2="70" y2="50" stroke="#393021" stroke-width="4" />
+        <line x1="50" y1="55" x2="35" y2="85" stroke="#393021" stroke-width="4" />
+        <line x1="50" y1="55" x2="65" y2="85" stroke="#393021" stroke-width="4" />
+        <!-- Suitcase -->
+        <rect x="68" y="48" width="16" height="20" rx="3" fill="#393021" />
+      </svg>
+
+      <div class="ground"></div>
+
+      <div class="game-over" id="gameOver">
+        <h3>Gate Closed ✈️</h3>
+        <p>Final Score: <span id="finalScore"></span></p>
+        <button onclick="restartGame()">Run Again</button>
+      </div>
+    </div>
+
+    <div class="instructions">Press <strong>SPACE</strong> to jump · Clear the luggage · Make your flight</div>
+  </div>
+</div>
+
+<!-- AUDIO -->
+<audio id="jumpSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_7b77c7c0d1.mp3"></audio>
+<audio id="board1" src="https://cdn.pixabay.com/audio/2022/03/15/audio_5fbeed9cfa.mp3"></audio>
+<audio id="board2" src="https://cdn.pixabay.com/audio/2022/03/15/audio_0e9f3d5f3c.mp3"></audio>
+
+<script>
+  const player = document.getElementById("player");
+  const game = document.getElementById("game");
+  const scoreEl = document.getElementById("score");
+  const gameOverScreen = document.getElementById("gameOver");
+  const finalScoreEl = document.getElementById("finalScore");
+
+  const jumpSound = document.getElementById("jumpSound");
+  const board1 = document.getElementById("board1");
+  const board2 = document.getElementById("board2");
+
+  let position = 0;
+  let isJumping = false;
+  let score = 0;
+  let speed = 5;
+
+  function jump() {
+    if (isJumping) return;
+    isJumping = true;
+    jumpSound.play();
+
+    let velocity = 15;
+    const jumpInterval = setInterval(() => {
+      position += velocity;
+      velocity -= 1;
+
+      if (position <= 0) {
+        position = 0;
+        isJumping = false;
+        clearInterval(jumpInterval);
+      }
+
+      player.style.bottom = position + 4 + "px";
+    }, 20);
+  }
+
+  function createSuitcase() {
+    const suitcase = document.createElement("div");
+    suitcase.classList.add("suitcase");
+
+    const type = Math.random() > 0.6 ? "checked" : "carryon";
+    suitcase.classList.add(type);
+    game.appendChild(suitcase);
+
+    let x = game.offsetWidth;
+    let scored = false;
+
+    const move = setInterval(() => {
+      x -= speed;
+      suitcase.style.left = x + "px";
+
+      const p = player.getBoundingClientRect();
+      const s = suitcase.getBoundingClientRect();
+
+      if (s.left < p.right && s.right > p.left && s.bottom > p.top && s.top < p.bottom) {
+        endGame();
+        clearInterval(move);
+      }
+
+      if (!scored && s.right < p.left) {
+        scored = true;
+        score++;
+        speed += 0.3;
+        scoreEl.textContent = score;
+
+        if (score === 5) board1.play();
+        if (score === 10) board2.play();
+      }
+
+      if (x < -60) {
+        clearInterval(move);
+        suitcase.remove();
+      }
+    }, 20);
+  }
+
+  function startGame() {
+    setInterval(createSuitcase, 1600);
+  }
+
+  function endGame() {
+    finalScoreEl.textContent = score;
+    gameOverScreen.style.display = "flex";
+  }
+
+  function restartGame() {
+    location.reload();
+  }
+
+  document.addEventListener("keydown", e => {
+    if (e.code === "Space") jump();
+  });
+
+  startGame();
+</script>
+
+<p class="navigation"><a href="#home">Back to Top</a></p>
+</body>
+</html>
